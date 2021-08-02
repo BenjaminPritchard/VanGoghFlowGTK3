@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "gdk.h": "c",
+        "gtk.h": "c",
+        "webkit2.h": "c",
+        "webkitcookiemanager.h": "c",
+        "vangoghflow.h": "c",
+        "app-indicator.h": "c"
+    }
+}

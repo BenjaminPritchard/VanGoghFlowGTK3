@@ -1,0 +1,55 @@
+{
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}",
+            "${workspaceFolder}/include"
+        ],
+        "myCompilerPath": "usr/bin/clang"
+    },
+    "configurations": [
+        {
+            "name": "include paths",
+            "intelliSenseMode": "linux-clang-x64",
+            "includePath": [
+                "/usr/include/gtk-3.0",
+                "/usr/include/at-spi2-atk/2.0",
+                "/usr/include/at-spi-2.0",
+                "/usr/include/dbus-1.0",
+                "/usr/lib/x86_64-linux-gnu/dbus-1.0/include",
+                "/usr/include/gtk-3.0",
+                "/usr/include/gio-unix-2.0",
+                "/usr/include/cairo",
+                "/usr/include/pango-1.0",
+                "/usr/include/harfbuzz",
+                "/usr/include/pango-1.0",
+                "/usr/include/fribidi",
+                "/usr/include/atk-1.0",
+                "/usr/include/cairo",
+                "/usr/include/pixman-1",
+                "/usr/include/freetype2",
+                "/usr/include/libpng16",
+                "/usr/include/gdk-pixbuf-2.0",
+                "/usr/include/libmount",
+                "/usr/include/blkid",
+                "/usr/include/uuid",
+                "/usr/include/glib-2.0",
+                "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+                "/usr/include/webkitgtk-4.0",
+                "/usr/include/libsoup-2.4/",
+                "/usr/include/libappindicator-0.1/libappindicator/",
+                "/usr/include/libdbusmenu-glib-0.4/libdbusmenu-glib/"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}
