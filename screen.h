@@ -10,7 +10,7 @@
 GtkWidget *window;
 WebKitWebView *web_view;
 
-void loadURL(WebKitWebView *web_view, char *target_url);
+void loadURL(WebKitWebView *web_view, int index);
 
 void screen_changed(GtkWidget *widget, GdkScreen *old_screen,
                     gpointer user_data);

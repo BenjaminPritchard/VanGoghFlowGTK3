@@ -9,7 +9,7 @@
               "name": "debug with gdb (no build)",
               "type": "cppdbg",
               "request": "launch",
-              "program": "${workspaceRoot}/hudkit",
+              "program": "${workspaceRoot}/vangoghflow",
               "args": [],
               "stopAtEntry": false,
               "cwd": "${workspaceRoot}",

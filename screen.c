@@ -1,5 +1,5 @@
 
-// all the code in here is taken (and maybe slightly adapted) from: XXX
+// all the code in here is taken (and maybe slightly adapted) from: https://github.com/anko/hudkit
 
 #include "screen.h"
 

@@ -15,10 +15,9 @@
 //
 // This code (i.e. this Linux port) is available on github here: XXX
 //
-// Almost everything in here is adapted from code originally from
-//  screen overlay: XXX
-//  tray icon:
-//  global hot keys:
+// Almost everything in here is adapted from code originally from:
+//  screen overlay: https://github.com/anko/hudkit
+//  tray icon: https://github.com/3v1n0/indicators-examples-snaps/blob/master/gtk3-appindicator/simple-client.c
 //
 // Writing programs like this is like standing on the shoulders of giants. I hope some people will find it cool and useful.
 //
@@ -38,16 +37,26 @@ gint delete_event(GtkWidget *widget,
     return FALSE;
 }
 
-void loadURL(WebKitWebView *web_view, char *target_url)
+void loadURL(WebKitWebView *web_view, int index)
 {
-    webkit_web_view_load_uri(web_view, target_url);
+    const int numURLS = 3;
+
+    if (index < numURLS)
+    {
+        // hard-coded URLs for now...
+        const gchar URLs[3][12] = {"_hHwz1UWJmI", "9TbLJI7ja4s", "95FxKgcgjN0"}; //"TYGjQYXQhl4"};
+        gchar YouTubeURL[80];                                                    // we know 80 is bigger than the longest URL we will create
+
+        snprintf(YouTubeURL, sizeof(YouTubeURL), "https://www.youtube.com/embed/%s?rel=0;&autoplay=1&mute=1", URLs[index]);
+        webkit_web_view_load_uri(web_view, (const gchar *)YouTubeURL);
+    }
+    else
+        fprintf(stderr, "invalid index passed to item_clicked_cb  %d\n", index);
 }
 
 int main(int argc, char **argv)
 {
     gtk_init(&argc, &argv);
-
-    char *target_url = "https://www.youtube.com/embed/_hHwz1UWJmI?rel=0;&autoplay=1&mute=1";
 
     // create main window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -70,9 +79,6 @@ int main(int argc, char **argv)
         webkit_web_view_new_with_context(wk_context));
 
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(web_view));
-
-    //webkit_web_view_load_uri(web_view, target_url);
-    loadURL(web_view, target_url);
 
     // Initialise the window and make it active.  We need this so it can resize
     // it correctly.
@@ -102,8 +108,9 @@ int main(int argc, char **argv)
     gdk_window_show(GDK_WINDOW(gdk_window));
     gtk_widget_set_opacity(GTK_WIDGET(window), 0.25);
 
+    loadURL(web_view, 0);
     MakeTrayIcon();
-    gtk_main();
 
+    gtk_main();
     return 0;
 }
