@@ -5,6 +5,7 @@
         "webkit2.h": "c",
         "webkitcookiemanager.h": "c",
         "vangoghflow.h": "c",
-        "app-indicator.h": "c"
+        "app-indicator.h": "c",
+        "keyboard.h": "c"
     }
 }

@@ -18,14 +18,18 @@
 // Almost everything in here is adapted from code originally from:
 //  screen overlay: https://github.com/anko/hudkit
 //  tray icon: https://github.com/3v1n0/indicators-examples-snaps/blob/master/gtk3-appindicator/simple-client.c
+//  hot keys: https://github.com/anko/xkbcat/blob/master/xkbcat.c
 //
-// Writing programs like this is like standing on the shoulders of giants. I hope some people will find it cool and useful.
+// Writing programs like this is like standing on the shoulders of giants. I hope some people will find it cool and interesting.
 //
 // Benjamin Pritchard / Kundalini Software
 // August 1 2021
 
 #include "screen.h"
 #include "tray.h"
+#include "keyboard.h"
+
+float opacity = 0.25;
 
 /* This callback quits the program */
 gint delete_event(GtkWidget *widget,
@@ -33,6 +37,7 @@ gint delete_event(GtkWidget *widget,
                   gpointer
                       data)
 {
+    shouldStop = true; // tell kb thread to quit
     gtk_main_quit();
     return FALSE;
 }
@@ -44,14 +49,36 @@ void loadURL(WebKitWebView *web_view, int index)
     if (index < numURLS)
     {
         // hard-coded URLs for now...
-        const gchar URLs[3][12] = {"_hHwz1UWJmI", "9TbLJI7ja4s", "95FxKgcgjN0"}; //"TYGjQYXQhl4"};
-        gchar YouTubeURL[80];                                                    // we know 80 is bigger than the longest URL we will create
+        const gchar URLs[3][12] = {"_hHwz1UWJmI", "9TbLJI7ja4s", "95FxKgcgjN0"};
+        gchar YouTubeURL[80]; // we know 80 is bigger than the longest URL we will create
 
         snprintf(YouTubeURL, sizeof(YouTubeURL), "https://www.youtube.com/embed/%s?rel=0;&autoplay=1&mute=1", URLs[index]);
         webkit_web_view_load_uri(web_view, (const gchar *)YouTubeURL);
     }
     else
         fprintf(stderr, "invalid index passed to item_clicked_cb  %d\n", index);
+}
+
+//Callback che crea lancia il thread
+void startKeyBDThread()
+{
+    GThread *myThread = g_thread_new(NULL, (GThreadFunc)CheckForHotKeys, NULL);
+}
+
+void DoUpdate(char *key)
+{
+    if (strcmp(key, "F3") == 0)
+    {
+        if (opacity != 0.0)
+            opacity -= 0.1;
+    }
+    else if (strcmp(key, "F4") == 0)
+    {
+        if (opacity != 1.0)
+            opacity += 0.1;
+    }
+
+    gtk_widget_set_opacity(GTK_WIDGET(window), opacity);
 }
 
 int main(int argc, char **argv)
@@ -63,7 +90,6 @@ int main(int argc, char **argv)
     gtk_window_set_gravity(GTK_WINDOW(window), GDK_GRAVITY_NORTH_WEST);
     gtk_window_move(GTK_WINDOW(window), 0, 0);
     gtk_window_set_title(GTK_WINDOW(window), "VanGoghFlow");
-    gtk_widget_set_opacity(GTK_WIDGET(window), 0.5);
     gtk_widget_set_app_paintable(window, TRUE);
 
     /* Set a handler for delete_event that immediately exits GTK. */
@@ -106,11 +132,15 @@ int main(int argc, char **argv)
     make_entire_window_clickthrough();
 
     gdk_window_show(GDK_WINDOW(gdk_window));
-    gtk_widget_set_opacity(GTK_WIDGET(window), 0.25);
+    gtk_widget_set_opacity(GTK_WIDGET(window), opacity);
 
-    loadURL(web_view, 0);
     MakeTrayIcon();
 
+    // setup background thread to listen for global keyboard events...
+    if (initKB())
+        startKeyBDThread();
+
+    loadURL(web_view, 0);
     gtk_main();
     return 0;
 }

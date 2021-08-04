@@ -1,4 +1,4 @@
-// This code is from: XXX
+// This code is from: https://github.com/3v1n0/indicators-examples-snaps/blob/master/gtk3-appindicator/simple-client.c
 // The original license is as follows:
 
 /*
@@ -26,16 +26,61 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "screen.h"
 #include "tray.h"
+#include "vangoghflow.h"
 
 #define LOCAL_ICON "simple-client-test-icon.png"
+
+static GtkWidget *item1;
+static GtkWidget *item2;
+static GtkWidget *item3;
+
+void dialog(gchar *message)
+{
+    GtkWidget *dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", message);
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
+static void
+about_menu_clicked(GtkWidget *widget, gpointer data)
+{
+    // maybe there is a way to make a better dialog in the future!
+    dialog("VanGoghFlow GTK3, written by Benjamin Pritchard.\n\n Use F3 and F4 to set opacity.\n\nhttps://www.kundalinisoftware.com/van-gogh-flow/");
+}
 
 static void
 item_clicked_cb(GtkWidget *widget, gpointer data)
 {
+
+    static bool noRecursion;
+
+    if (noRecursion)
+        return;
+
+    noRecursion = true;
     const char *tmp = (const char *)data;
     int index = atoi(tmp);
 
-    // loadURL() does range checking
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item1), false);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item2), false);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item3), false);
+
+    switch (index)
+    {
+    case 0:
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item1), true);
+        break;
+    case 1:
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item2), true);
+        break;
+    case 2:
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item3), true);
+        break;
+    }
+
+    noRecursion = false;
+
+    //loadURL() does range checking
     loadURL(web_view, index);
 }
 
@@ -56,22 +101,40 @@ void MakeTrayIcon()
     app_indicator_set_title(ci, "Van Gogh Flow");
 
     menu = gtk_menu_new();
-    GtkWidget *item = gtk_menu_item_new_with_label("Visualization 1");
-    g_signal_connect(item, "activate",
-                     G_CALLBACK(item_clicked_cb), "0");
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-    gtk_widget_show(item);
-    item = gtk_menu_item_new_with_label("Visualization 2");
-    g_signal_connect(item, "activate",
-                     G_CALLBACK(item_clicked_cb), "1");
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-    gtk_widget_show(item);
 
-    item = gtk_menu_item_new_with_label("Visualization 3");
-    g_signal_connect(item, "activate",
+    item1 = gtk_check_menu_item_new_with_label("Visualization 1");
+    g_signal_connect(item1, "activate",
+                     G_CALLBACK(item_clicked_cb), "0");
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), (GtkWidget *)item1);
+    gtk_widget_show(item1);
+
+    item2 = gtk_check_menu_item_new_with_label("Visualization 2");
+    g_signal_connect(item2, "activate",
+                     G_CALLBACK(item_clicked_cb), "1");
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), (GtkWidget *)item2);
+    gtk_widget_show(item2);
+
+    item3 = gtk_check_menu_item_new_with_label("Visualization 3");
+    g_signal_connect(item3, "activate",
                      G_CALLBACK(item_clicked_cb), "2");
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-    gtk_widget_show(item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), (GtkWidget *)item3);
+    gtk_widget_show(item3);
+
+    GtkWidget *menuitem = gtk_separator_menu_item_new();
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    gtk_widget_show(menuitem);
+
+    GtkWidget *aboutMenu = gtk_menu_item_new_with_label("About");
+    g_signal_connect(aboutMenu, "activate",
+                     G_CALLBACK(about_menu_clicked), "3");
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), (GtkWidget *)aboutMenu);
+    gtk_widget_show(aboutMenu);
+
+    // make sure to do this down here, after all the items are created
+    // otherwise item_clicked_cb() will blow up
+    // (i spent like an hour trying to figure that one out)
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item1),
+                                   true);
 
     app_indicator_set_menu(ci, GTK_MENU(menu));
 }
