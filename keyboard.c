@@ -1,26 +1,24 @@
+
+// this code mostly comes from here: https://github.com/anko/xkbcat/blob/master/xkbcat.c
+
 #include "keyboard.h"
 #include "vangoghflow.h"
 
 #include <X11/XKBlib.h>
 #include <X11/extensions/XInput2.h>
 
-const char *DEFAULT_DISPLAY = ":0";
-const bool DEFAULT_PRINT_UP = false;
-
 int xiOpcode;
-char xDisplayName[2];
-bool printKeyUps = DEFAULT_PRINT_UP;
 Display *disp;
 
 bool initKB()
 {
 
-       // Connect to X display
+    // Connect to X display
     // this is just harded for now...
     disp = XOpenDisplay(":0");
     if (NULL == disp)
     {
-        fprintf(stderr, "Cannot open X display: %s\n", xDisplayName);
+        fprintf(stderr, "Cannot open X display: %s\n", ":0");
         return false;
     }
 
@@ -54,8 +52,6 @@ bool initKB()
         m.mask_len = XIMaskLen(XI_LASTEVENT);
         m.mask = calloc(m.mask_len, sizeof(char));
         XISetMask(m.mask, XI_RawKeyPress);
-        if (printKeyUps)
-            XISetMask(m.mask, XI_RawKeyRelease);
         XISelectEvents(disp, root, &m, 1 /*number of masks*/);
         XSync(disp, false);
         free(m.mask);
@@ -92,7 +88,7 @@ void *CheckForHotKeys()
                 if (NULL == str)
                     continue;
 
-                DoUpdate(str);
+                gdk_threads_add_idle_full(G_PRIORITY_DEFAULT_IDLE, DoUpdate, str, NULL);
                 break;
             }
             }

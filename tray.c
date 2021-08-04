@@ -51,9 +51,10 @@ about_menu_clicked(GtkWidget *widget, gpointer data)
 static void
 item_clicked_cb(GtkWidget *widget, gpointer data)
 {
-
     static bool noRecursion;
 
+    // trying to set the menu items to checked/unchecked using gtk_check_menu_item_set_active()
+    // causes this function to be called again!!
     if (noRecursion)
         return;
 
@@ -78,10 +79,10 @@ item_clicked_cb(GtkWidget *widget, gpointer data)
         break;
     }
 
-    noRecursion = false;
-
     //loadURL() does range checking
     loadURL(web_view, index);
+
+    noRecursion = false;
 }
 
 void MakeTrayIcon()

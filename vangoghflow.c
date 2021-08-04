@@ -65,8 +65,14 @@ void startKeyBDThread()
     GThread *myThread = g_thread_new(NULL, (GThreadFunc)CheckForHotKeys, NULL);
 }
 
-void DoUpdate(char *key)
+// this routine is called by the thread created in startKeyBDThread()
+// by using gdk_threads_add_idle_full()
+// My understanding is that using gdk_threads_add_idle() is the way
+// we are suppossed to pass data from the background thread back to our
+// UI thread here
+gboolean DoUpdate(void *data)
 {
+    char *key = (char *)data;
     if (strcmp(key, "F3") == 0)
     {
         if (opacity != 0.0)
@@ -79,6 +85,10 @@ void DoUpdate(char *key)
     }
 
     gtk_widget_set_opacity(GTK_WIDGET(window), opacity);
+
+    // i think we have to return false each time, so that this routine won't be called more than one
+    // per invocation of gdk_threads_add_idle()
+    return false;
 }
 
 int main(int argc, char **argv)
