@@ -26,6 +26,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "screen.h"
 #include "tray.h"
+#include "keyboard.h"
 #include "vangoghflow.h"
 
 #define LOCAL_ICON "simple-client-test-icon.png"
@@ -46,6 +47,13 @@ about_menu_clicked(GtkWidget *widget, gpointer data)
 {
     // maybe there is a way to make a better dialog in the future!
     dialog("VanGoghFlow GTK3, written by Benjamin Pritchard.\n\n Use F3 and F4 to set opacity.\n\nhttps://www.kundalinisoftware.com/van-gogh-flow/");
+}
+
+static void
+quit_menu_clicked(GtkWidget *widget, gpointer data)
+{
+    shouldStop = true; // tell kb thread to quit
+    gtk_main_quit();
 }
 
 static void
@@ -85,7 +93,7 @@ item_clicked_cb(GtkWidget *widget, gpointer data)
     noRecursion = false;
 }
 
-void MakeTrayIcon()
+void MakeTrayIcon(int *visualizationIndex)
 {
     GtkWidget *menu = NULL;
     AppIndicator *ci = NULL;
@@ -127,15 +135,23 @@ void MakeTrayIcon()
 
     GtkWidget *aboutMenu = gtk_menu_item_new_with_label("About");
     g_signal_connect(aboutMenu, "activate",
-                     G_CALLBACK(about_menu_clicked), "3");
+                     G_CALLBACK(about_menu_clicked), "");
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), (GtkWidget *)aboutMenu);
     gtk_widget_show(aboutMenu);
+
+    GtkWidget *quitMenu = gtk_menu_item_new_with_label("Quit");
+    g_signal_connect(quitMenu, "activate",
+                     G_CALLBACK(quit_menu_clicked), "");
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), (GtkWidget *)quitMenu);
+    gtk_widget_show(quitMenu);
 
     // make sure to do this down here, after all the items are created
     // otherwise item_clicked_cb() will blow up
     // (i spent like an hour trying to figure that one out)
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item1),
-                                   true);
+
+    char str[3];
+    sprintf(str, "%d", *visualizationIndex);
+    item_clicked_cb(NULL, (void *)str); // item clicked needs a pointer to a string version of the index
 
     app_indicator_set_menu(ci, GTK_MENU(menu));
 }

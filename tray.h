@@ -1,3 +1,3 @@
 #pragma once
 
-void MakeTrayIcon();
+void MakeTrayIcon(int *visualizationIndex);
